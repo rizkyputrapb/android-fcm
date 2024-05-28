@@ -1,4 +1,4 @@
-package com.vsp.flutter_notification
+package co.onelabs.ocbcmerctemp
 
 import io.flutter.embedding.android.FlutterActivity
 

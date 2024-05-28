@@ -45,7 +45,7 @@ Future<void> main() async {
 
   //If subscribe based sent notification then use this token
   final fcmToken = await messaging.getToken();
-  print(fcmToken);
+  print("FCM TOKEN : $fcmToken");
 
   //If subscribe based on topic then use this
   await messaging.subscribeToTopic('flutter_notification');

@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_notification/fcm_model.dart';
 import 'package:flutter_notification/main.dart';
 import 'package:flutter_notification/product.dart';
 
@@ -36,34 +38,35 @@ class _HomePageState extends State<HomePage> {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
 
-      if (notification != null && android != null && !kIsWeb) {
-        String action = jsonEncode(message.data);
+      final fcm = FCMDataModel.fromJson(jsonDecode(message.data['aps']));
 
-        flutterLocalNotificationsPlugin!.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel!.id,
-                channel!.name,
-                priority: Priority.high,
-                importance: Importance.max,
-                setAsGroupSummary: true,
-                styleInformation: DefaultStyleInformation(true, true),
-                largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
-                channelShowBadge: true,
-                autoCancel: true,
-                icon: '@drawable/ic_notifications_icon',
-              ),
-            ),
-            payload: action);
-      }
+      flutterLocalNotificationsPlugin!.show(
+        notification.hashCode,
+        fcm.alert?.title,
+        fcm.alert?.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel!.id,
+            channel!.name,
+            priority: Priority.high,
+            importance: Importance.max,
+            setAsGroupSummary: true,
+            styleInformation: DefaultStyleInformation(true, true),
+            largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+            channelShowBadge: true,
+            autoCancel: true,
+            icon: '@drawable/ic_notifications_icon',
+          ),
+        ),
+      );
       print('A new event was published!');
+      print('FCM MESSAGE : ${notification}');
     });
 
     FirebaseMessaging.onMessageOpenedApp
         .listen((message) => _handleMessage(message.data));
+
+
   }
 
   Future<dynamic> onSelectNotification(payload) async {
